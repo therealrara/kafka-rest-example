@@ -65,4 +65,4 @@ jobs:
             exit 1
           fi
           # Check rollout status
-          kubectl rollout status deployment/rkumar-service
+          kubectl rollout status rkumar-namespace/rkumar-service
