@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rkumar-service
+  namespace: rkumar-namespace
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: rkumar-service
+  template:
+    metadata:
+      labels:
+        app: rkumar-service
+    spec:
+      containers:
+        - name: rkumar-service
+          image: 471112682193.dkr.ecr.us-east-2.amazonaws.com/rkumar-registry:latest
+          ports:
+            - containerPort: 8080
