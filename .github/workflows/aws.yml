@@ -1,4 +1,4 @@
-name: Build, Push and Deploy to EKS
+name: Deploy Docker Image to Amazon ECR
 
 on:
   push:
@@ -6,45 +6,44 @@ on:
       - master
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+   build-and-push-image:
+     name: Build and Push Docker Image
+     runs-on: ubuntu-latest
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+     steps:
+       - name: Checkout code
+         uses: actions/checkout@v2
 
-      - name: Login to Amazon ECR
-        run: |
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin <ecr-repository-url>
+       - name: Login to Amazon ECR
+         run: |
+           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin 471112682193.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+       - name: Build Docker image
+         run: docker build -t rkumar-registry .
 
-      - name: Build Docker image
-        run: docker build -t <ecr-repository-url>/myapp:${{ github.sha }} .
+       - name: Tag Docker image
+         run: docker tag rkumar-registry:latest 471112682193.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/rkumar-registry:latest
 
-      - name: Push Docker image to ECR
-        run: docker push <ecr-repository-url>/myapp:${{ github.sha }}
+       - name: Push Docker image to Amazon ECR
+         run: docker push 471112682193.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/rkumar-registry:latest
 
-      - name: Set up Kubectl
-        uses: azure/setup-kubectl@v1
+       - name: Set up Kubectl
+         uses: azure/setup-kubectl@v1
 
-      - name: Set up AWS IAM Authenticator
-        uses: prepor/action-aws-iam-authenticator@master
+       - name: Set up AWS IAM Authenticator
+         uses: prepor/action-aws-iam-authenticator@master
 
-      - name: Configure AWS EKS
-        run: aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name <your-cluster-name>
+       - name: Configure AWS EKS
+         run: aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name rkumar-cluster
 
-      - name: Deploy to EKS
-        run: |
-          kubectl apply -f rkumar-namespace.yaml
-          kubectl apply -f k8s-deployment.yaml
-          kubectl apply -f service.yaml
-          kubectl apply -f ingress.yaml
+       - name: Create Namespace (if not exists)
+         run: kubectl apply -f rkumar-namespace.yaml
 
-      - name: Verify Deployment
-        run: |
-          kubectl rollout status deployment/myapp-deployment
+       - name: Deploy to EKS
+         run: |
+           kubectl apply -f rkumar-namespace.yaml
+           kubectl apply -f k8s-deployment.yaml
+           kubectl apply -f service.yaml
+           kubectl apply -f ingress.yaml
+       - name: Verify Deployment and Check Rollout Status
+         run: |
+           kubectl rollout status rkumar-namespace/rkumar-service
