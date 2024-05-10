@@ -41,7 +41,7 @@ jobs:
     - name: Configure AWS EKS
       run: aws eks --region us-east-2 update-kubeconfig --name rkumar-cluster
     - name: Create Namespace (if not exists)
-      run: kubectl apply -f namespace.yaml
+      run: kubectl apply -f rkumar-namespace.yaml
     - name: Deploy to EKS
       run: |
         kubectl apply -f k8s-deployment.yaml
