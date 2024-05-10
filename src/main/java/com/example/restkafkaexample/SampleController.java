@@ -11,7 +11,7 @@ public class SampleController {
 
     @GetMapping("/health")
     public String getHealth() {
-        log.info("Health Check Enabled");
+        log.info("Health Check Enabled2");
         return "Welcome to the public server";
     }
 }
