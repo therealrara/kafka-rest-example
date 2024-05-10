@@ -33,7 +33,7 @@ jobs:
         uses: azure/setup-kubectl@v1
 
       - name: Set up AWS IAM Authenticator
-        uses: aws-actions/aws-iam-authenticator@v1
+        uses: prepor/action-aws-iam-authenticator@master
 
       - name: Configure AWS EKS
         run: aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name <your-cluster-name>
