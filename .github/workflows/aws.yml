@@ -45,5 +45,20 @@ jobs:
     - name: Deploy to EKS
       run: |
         kubectl apply -f k8s-deployment.yaml
+    - name: Verify Deployment and Check Rollout Status
+      run: |
+        # Wait until the deployment is available
+        MAX_TRIES=10
+        SLEEP_TIME=6
+        COUNT=0
+        until kubectl get deployment rkumar-service || [ $COUNT -eq $MAX_TRIES ]; do
+          sleep $SLEEP_TIME
+          COUNT=$(($COUNT + 1))
+        done
+        if [ $COUNT -eq $MAX_TRIES ]; then
+          echo "Deployment not found after several attempts."
+          exit 1
+        fi
+        # Check rollout status
         kubectl rollout status deployment/rkumar-service
 
