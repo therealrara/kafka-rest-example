@@ -3,7 +3,7 @@ name: Deploy Docker Image to Amazon ECR
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build-and-push-image:
