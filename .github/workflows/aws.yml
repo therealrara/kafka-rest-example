@@ -23,14 +23,14 @@ jobs:
 
     - name: Login to Amazon ECR
       run: |
-        aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin 471112682193.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+        aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 471112682193.dkr.ecr.us-east-2.amazonaws.com
 
     - name: Build Docker image
       run: docker build -t rkumar-registry .
 
     - name: Tag Docker image
-      run: docker tag rkumar-registry:latest 471112682193.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/rkumar-registry:latest
+      run: docker tag rkumar-registry:latest 471112682193.dkr.ecr.us-east-2.amazonaws.com/rkumar-registry:latest
 
     - name: Push Docker image to Amazon ECR
-      run: docker push 471112682193.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/rkumar-registry:latest
+      run: docker push 471112682193.dkr.ecr.us-east-2.amazonaws.com/rkumar-registry:latest
 
