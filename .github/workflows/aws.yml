@@ -1,0 +1,36 @@
+name: Deploy Docker Image to Amazon ECR
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push-image:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: AKIAW3MEBBLI3H4LRMR3
+        aws-secret-access-key: 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
+        aws-region: us-east-2
+
+    - name: Login to Amazon ECR
+      run: |
+        aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin 471112682193.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+    - name: Build Docker image
+      run: docker build -t rkumar-registry .
+
+    - name: Tag Docker image
+      run: docker tag rkumar-registry:latest 471112682193.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/rkumar-registry:latest
+
+    - name: Push Docker image to Amazon ECR
+      run: docker push 471112682193.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/rkumar-registry:latest
+
